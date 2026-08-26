@@ -1,0 +1,61 @@
+version: "3.9"
+
+services:
+  mongo:
+    image: mongo:7
+    container_name: task-manager-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - task-manager-net
+
+  ai-service:
+    build: ./ai-service
+    container_name: task-manager-ai
+    restart: unless-stopped
+    env_file:
+      - ./ai-service/.env
+    ports:
+      - "8000:8000"
+    networks:
+      - task-manager-net
+
+  backend:
+    build: ./backend
+    container_name: task-manager-backend
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/taskmanager
+      - AI_SERVICE_URL=http://ai-service:8000
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongo
+      - ai-service
+    networks:
+      - task-manager-net
+
+  frontend:
+    build: ./frontend
+    container_name: task-manager-frontend
+    restart: unless-stopped
+    env_file:
+      - ./frontend/.env
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    networks:
+      - task-manager-net
+
+volumes:
+  mongo_data:
+
+networks:
+  task-manager-net:
+    driver: bridge
