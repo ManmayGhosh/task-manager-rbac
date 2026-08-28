@@ -1,11 +1,11 @@
 from typing import List, Optional
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from services.openai_service import breakdown_task, generate_digest
+from services.ai_provider import breakdown_task, generate_digest
 
 load_dotenv()
 
@@ -43,16 +43,12 @@ def health():
 
 @app.post("/breakdown")
 def breakdown(req: BreakdownRequest):
-    try:
-        return breakdown_task(req.title, req.description or "")
-    except Exception as exc:
-        raise HTTPException(status_code=502, detail=f"AI breakdown failed: {exc}")
+    # Never raises: falls back to a rule-based result if the AI call fails.
+    return breakdown_task(req.title, req.description or "")
 
 
 @app.post("/digest")
 def digest(req: DigestRequest):
-    try:
-        tasks_payload = [t.model_dump() for t in req.tasks]
-        return generate_digest(tasks_payload, req.user_name or "there")
-    except Exception as exc:
-        raise HTTPException(status_code=502, detail=f"AI digest failed: {exc}")
+    tasks_payload = [t.model_dump() for t in req.tasks]
+    # Never raises: falls back to a rule-based summary if the AI call fails.
+    return generate_digest(tasks_payload, req.user_name or "there")
