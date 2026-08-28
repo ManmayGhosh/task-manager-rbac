@@ -4,6 +4,9 @@ A full-stack task management app with role-based access control (RBAC) and an
 AI-powered assistant that breaks tasks into subtasks, suggests
 priority/effort, and generates a daily digest of what's pending.
 
+**[Live demo](https://task-manager-rbac-frontend.onrender.com)**
+---
+
 ## Architecture
 
 ```
