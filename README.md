@@ -102,3 +102,13 @@ To stop: `docker compose down` (add `-v` to also wipe the Mongo volume).
 - Passwords are hashed with bcrypt; auth uses stateless JWTs (7-day expiry by default).
 - The AI service is a separate deployable unit — can be swapped
   by editing `ai-service/services/openai_service.py` without touching the Node backend.
+
+
+### Task Manager — Full-Stack RBAC Platform with AI Task Assistant
+**React (Vite) · Node.js/Express · MongoDB · Python (FastAPI) · Docker**
+[Live App](https://task-manager-rbac-frontend.onrender.com) · [GitHub Repo](#)
+
+- Built a full MERN task-management platform with **three-tier role-based access control** (admin/manager/member) enforced at the middleware layer across 13+ REST endpoints — members can only see and act on tasks they created or were assigned, closing off the client-side-only permission checks that make most RBAC demos trivially bypassable
+- Designed a **decoupled Python FastAPI microservice** for AI features (task breakdown, priority suggestion, daily digest) communicating over an internal HTTP boundary, so the AI provider can be swapped without touching the Node backend or React frontend
+- Diagnosed and fixed a **cross-package version incompatibility** between the `openai` SDK and a newer `httpx` release that silently broke every AI request in production, then re-architected the AI layer with a **deterministic rule-based fallback** so subtask generation and digests keep working even when the LLM provider is rate-limited or unreachable
+- Deployed frontend, backend, and AI service as **independently scalable containers** on Render with MongoDB Atlas as the managed database, each service redeployable on its own without rebuilding the others
